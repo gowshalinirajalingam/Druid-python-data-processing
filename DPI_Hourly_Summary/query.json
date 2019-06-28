@@ -1,0 +1,83 @@
+{
+    "granularity": "all",
+    "context": {
+        "timeout": 60000,
+        "queryId": "e16dce78-a99f-4ca8-8084-2016c7613859"
+    },
+    "queryType": "groupBy",
+    "dataSource": "ipdr_hourly_usage_summarize_data_2",
+    "dimensions": [
+        "district",
+        {
+            "type": "extraction",
+            "dimension": "__time",
+            "outputName": "timestamp",
+            "extractionFn": {
+                "type": "timeFormat",
+                "format": "yyyy-MM-dd'T'HH:00:00Z",
+                "timeZone": "UTC",
+                "locale": "en-US"
+            }
+        }
+    ],
+    "aggregations": [
+        {
+            "type": "doubleSum",
+            "name": "usage_Bytes",
+            "fieldName": "total"
+        },
+        {
+            "type": "count",
+            "name": "cell_count",
+            "fieldName": "cell_id"
+        }
+    ],
+    "postAggregations": [
+        {
+            "type": "arithmetic",
+            "name": "Usage_GB",
+            "fn": "/",
+            "fields": [
+                {
+                    "type": "fieldAccess",
+                    "fieldName": "usage_Bytes"
+                },
+                {
+                    "type": "arithmetic",
+                    "name": "mul__1024 * 1024 * 1024",
+                    "fn": "*",
+                    "fields": [
+                        {
+                            "type": "constant",
+                            "name": "1024",
+                            "value": 1024
+                        },
+                        {
+                            "type": "constant",
+                            "name": "1024",
+                            "value": 1024
+                        },
+                        {
+                            "type": "constant",
+                            "name": "1024",
+                            "value": 1024
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "limitSpec": {
+        "columns": [
+            {
+                "dimension": "district",
+                "direction": "ascending"
+            },
+            {
+                "dimension": "timestamp",
+                "direction": "ascending"
+            }
+        ]
+    },
+    "intervals": "2019-04-25T11:00:00.000Z/2019-06-28T11:00:00.000Z"
+}

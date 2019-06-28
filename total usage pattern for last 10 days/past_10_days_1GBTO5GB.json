@@ -1,0 +1,96 @@
+{
+    "queryType": "groupBy",
+    "threshold": 1000,
+    "dimensions": [
+        "timestamp"
+    ],
+    "dataSource": {
+        "type": "query",
+        "query": {
+            "queryType": "groupBy",
+            "threshold": 1000,
+            "dimensions": [
+                {
+                    "type": "extraction",
+                    "dimension": "__time",
+                    "outputName": "timestamp",
+                    "extractionFn": {
+                        "type": "timeFormat",
+                        "format": "yyyy-MM-dd",
+                        "timeZone": "UTC",
+                        "locale": "en-US"
+                    }
+                },
+                "subscriber_id"
+            ],
+            "dataSource": "ipdr_subscriber_based_usage",
+            "granularity": "all",
+            "context": {
+                "timeout": 60000,
+                "queryId": "e16dce78-a99f-4ca8-8084-2016c7613859"
+            },
+            "postAggregations": [
+                {
+                    "type": "arithmetic",
+                    "name": "Usage(GB)",
+                    "fn": "/",
+                    "fields": [
+                        {
+                            "type": "fieldAccess",
+                            "fieldName": "___sum_894"
+                        },
+                        {
+                            "type": "constant",
+                            "name": "1073741824",
+                            "value": 1073741824
+                        }
+                    ]
+                }
+            ],
+            "aggregations": [
+                {
+                    "type": "doubleSum",
+                    "name": "___sum_894",
+                    "fieldName": "total"
+                }
+            ],
+            "having": {
+                "type": "and",
+                "havingSpecs": [
+                    {
+                        "type": "lessThan",
+                        "aggregation": "___sum_894",
+                        "value": 5368709120
+                    },
+                    {
+                        "type": "greaterThan",
+                        "aggregation": "___sum_894",
+                        "value": 1073741824
+                    }
+                ]
+            },
+            "limitSpec": {
+                "columns": [
+                    {
+                        "dimensions": "timestamp",
+                        "direction": "ascending"
+                    },
+                    {
+                        "dimension": "subscriber_id",
+                        "direction": "ascending"
+                    }
+                ]
+            },
+            "intervals": "2019-06-18T00:00:00.000Z/2019-06-28T00:00:00.000Z"
+        }
+    },
+    "granularity": "all",
+    "aggregations": [
+        {
+            "type": "doubleSum",
+            "name": "Total_usage",
+            "fieldName": "Usage(GB)"
+        }
+    ],
+    "intervals": "2019-06-18T00:00:00.000Z/2019-06-28T00:00:00.000Z"
+}

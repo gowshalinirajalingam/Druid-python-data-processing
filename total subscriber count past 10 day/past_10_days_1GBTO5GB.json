@@ -1,0 +1,89 @@
+{
+    "queryType": "groupBy",
+    "dataSource": {
+        "type": "query",
+        "query": {
+            "queryType": "groupBy",
+            "threshold": 5000,
+            "dimensions": [
+                {
+                    "type": "extraction",
+                    "dimension": "__time",
+                    "outputName": "Date",
+                    "extractionFn": {
+                        "type": "timeFormat",
+                        "format": "yyyy-MM-ddZZ",
+                        "timeZone": "UTC",
+                        "locale": "en-US"
+                    }
+                },
+                "subscriber_id"
+            ],
+            "granularity": "all",
+            "dataSource": "ipdr_subscriber_based_usage",
+            "context": {
+                "timeout": 1200000,
+                "queryId": "d4d69a3e-cf74-40c5-a787-a7d4d01f3075"
+            },
+            "aggregations": [
+                {
+                    "type": "javascript",
+                    "name": "total_usage(MB)",
+                    "fieldNames": [
+                        "total"
+                    ],
+                    "fnReset": "function() { return 0 ; }",
+                    "fnAggregate": "function(current, x) { return (current + (parseFloat(x))/(1048576) || 0); }",
+                    "fnCombine": "function(x, y) { return (x + y); }"
+                }
+            ],
+            "having": {
+                "type": "and",
+                "havingSpecs": [
+                    {
+                        "type": "greaterThan",
+                        "aggregation": "total_usage(MB)",
+                        "value": 1024
+                    },
+                    {
+                        "type": "lessThan",
+                        "aggregation": "total_usage(MB)",
+                        "value": 5120
+                    }
+                ]
+            },
+            "limitSpec": {
+                "columns": [
+                    {
+                        "dimension": "subscriber_id",
+                        "direction": "ascending"
+                    },
+                    {
+                        "dimension": "Date",
+                        "direction": "ascending"
+                    }
+                ]
+            },
+            "intervals": "2019-06-18T00:00:00.000Z/2019-06-28T00:00:00.000Z"
+        }
+    },
+    "granularity": "all",
+    "dimensions": [
+        "Date"
+    ],
+    "aggregations": [
+        {
+            "type": "count",
+            "name": "count"
+        }
+    ],
+    "limitSpec": {
+        "columns": [
+            {
+                "dimension": "Date",
+                "direction": "ascending"
+            }
+        ]
+    },
+    "intervals": "2019-06-18T00:00:00.000Z/2019-06-28T00:00:00.000Z"
+}
